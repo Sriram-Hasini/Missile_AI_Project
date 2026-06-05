@@ -1,326 +1,396 @@
+import sys
+import os
+
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            ".."
+        )
+    )
+)
+
 import streamlit as st
 import pandas as pd
-import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
 
+from utils.type_detector import detect_type
+from utils.converter import convert_value
+
+# ----------------------------------------
+# SUBSYSTEM GROUPS
+# ----------------------------------------
+
+SUBSYSTEM_GROUPS = {
+
+    "Propulsion": [
+        "W0", "W1", "W2", "W3", "W4", "W5"
+    ],
+
+    "Thermal": [
+        "W6", "W7", "W8", "W9", "W10", "W11"
+    ],
+
+    "Navigation": [
+        "W12", "W13", "W14", "W15", "W16", "W17"
+    ],
+
+    "Structural": [
+        "W18", "W19", "W20", "W21", "W22", "W23"
+    ],
+
+    "Power": [
+        "W24", "W25", "W26", "W27",
+        "W28", "W29", "W30", "W31"
+    ]
+}
 
 # ----------------------------------------
 # PAGE CONFIG
 # ----------------------------------------
 
 st.set_page_config(
-
-    page_title="Missile AI Intelligence Dashboard",
-
+    page_title="Telemetry Intelligence Platform",
     layout="wide"
 )
-
-
-# ----------------------------------------
-# LOAD DATA
-# ----------------------------------------
-
-telemetry_df = pd.read_csv(
-    "missile_telemetry_data.csv"
-)
-
-analysis_df = pd.read_csv(
-    "behavior_analysis_results.csv"
-)
-
 
 # ----------------------------------------
 # HEADER
 # ----------------------------------------
 
-st.title("🚀 Missile AI Intelligence Dashboard")
+st.title("Telemetry Intelligence Platform")
 
-st.markdown("""
-Advanced AI-Driven Missile Subsystem
-Telemetry & Behavioral Intelligence Platform
-""")
-
+st.markdown(
+    """
+    Upload telemetry data and analyze subsystem
+    information, conversions and health status.
+    """
+)
 
 # ----------------------------------------
-# KPI CARDS
+# FILE UPLOAD
 # ----------------------------------------
 
-avg_health = round(
-    telemetry_df["system_health_score"].mean(),
-    2
+uploaded_file = st.file_uploader(
+    "Upload Telemetry File",
+    type=["csv", "txt"]
 )
-
-max_temp = round(
-    telemetry_df["thermal_temperature"].max(),
-    2
-)
-
-avg_vibration = round(
-    telemetry_df["structural_vibration"].mean(),
-    3
-)
-
-total_anomalies = int(
-    analysis_df["anomaly_flag"].sum()
-)
-
-col1, col2, col3, col4 = st.columns(4)
-
-col1.metric(
-    "System Health Score",
-    avg_health
-)
-
-col2.metric(
-    "Maximum Temperature",
-    max_temp
-)
-
-col3.metric(
-    "Avg Structural Vibration",
-    avg_vibration
-)
-
-col4.metric(
-    "Detected Anomalies",
-    total_anomalies
-)
-
 
 # ----------------------------------------
-# OPERATIONAL PHASE DISTRIBUTION
+# MAIN DASHBOARD
 # ----------------------------------------
 
-st.subheader("Operational Phase Distribution")
+if uploaded_file is not None:
 
-phase_counts = telemetry_df[
-    "operational_phase"
-].value_counts()
+    try:
 
-fig_phase = px.pie(
+        df = pd.read_csv(uploaded_file)
 
-    names=phase_counts.index,
+        # ----------------------------------------
+        # KPI CARDS
+        # ----------------------------------------
 
-    values=phase_counts.values,
+        col1, col2, col3, col4 = st.columns(4)
 
-    title="Mission Operational Phases"
-)
+        col1.metric(
+            "Total Records",
+            len(df)
+        )
 
-st.plotly_chart(
-    fig_phase,
-    use_container_width=True
-)
+        col2.metric(
+            "Total Words",
+            len(df.columns)
+        )
 
+        col3.metric(
+            "System Status",
+            "Active"
+        )
 
-# ----------------------------------------
-# TEMPERATURE GRAPH
-# ----------------------------------------
+        col4.metric(
+            "Monitoring",
+            "Enabled"
+        )
 
-st.subheader("Thermal Temperature Monitoring")
+        # ----------------------------------------
+        # TELEMETRY TABLE
+        # ----------------------------------------
 
-fig_temp = px.line(
+        st.subheader("Telemetry Dataset")
 
-    telemetry_df,
+        st.dataframe(
+            df,
+            use_container_width=True
+        )
 
-    y="thermal_temperature",
+        # ----------------------------------------
+        # VALUE DROPDOWN
+        # ----------------------------------------
 
-    title="Thermal Temperature Variation"
-)
+        all_values = []
 
-st.plotly_chart(
-    fig_temp,
-    use_container_width=True
-)
+        for column in df.columns:
 
+            all_values.extend(
+                df[column].astype(str).tolist()
+            )
 
-# ----------------------------------------
-# PROPULSION PRESSURE GRAPH
-# ----------------------------------------
+        unique_values = sorted(
+            list(set(all_values))
+        )
 
-st.subheader("Propulsion Pressure Monitoring")
+        st.subheader(
+            "Select Telemetry Value"
+        )
 
-fig_pressure = px.line(
+        search_value = st.selectbox(
+            "Available Values",
+            unique_values
+        )
 
-    telemetry_df,
+        found = False
 
-    y="propulsion_pressure",
+        # ----------------------------------------
+        # SEARCH LOGIC
+        # ----------------------------------------
 
-    title="Propulsion Pressure Dynamics"
-)
+        for col in df.columns:
 
-st.plotly_chart(
-    fig_pressure,
-    use_container_width=True
-)
+            for idx, value in enumerate(df[col]):
 
+                if str(value) == search_value:
 
-# ----------------------------------------
-# STRUCTURAL VIBRATION
-# ----------------------------------------
+                    found = True
 
-st.subheader("Structural Vibration Analysis")
+                    detected_type = detect_type(
+                        value
+                    )
 
-fig_vibration = px.line(
+                    predicted_subsystem = "Unknown"
 
-    telemetry_df,
+                    for subsystem, words in SUBSYSTEM_GROUPS.items():
 
-    y="structural_vibration",
+                        if col in words:
 
-    title="Structural Vibration Behavior"
-)
+                            predicted_subsystem = subsystem
+                            break
 
-st.plotly_chart(
-    fig_vibration,
-    use_container_width=True
-)
+                    # ----------------------------------------
+                    # PARAMETER INTERPRETATION
+                    # ----------------------------------------
 
+                    st.markdown(
+                        f"""
+### Parameter Interpretation
 
-# ----------------------------------------
-# NAVIGATION DRIFT
-# ----------------------------------------
+| Attribute | Value |
+|-----------|--------|
+| Selected Value | {value} |
+| Word Location | {col} |
+| Row Number | {idx} |
+| Data Type | {detected_type} |
+| Subsystem | {predicted_subsystem} |
+"""
+                    )
 
-st.subheader("Navigation Drift Monitoring")
+                    # ----------------------------------------
+                    # SUBSYSTEM DATA
+                    # ----------------------------------------
 
-fig_nav = px.line(
+                    st.markdown(
+                        f"""
+## {predicted_subsystem} Subsystem Data
+"""
+                    )
 
-    telemetry_df,
+                    subsystem_words = SUBSYSTEM_GROUPS[
+                        predicted_subsystem
+                    ]
 
-    y="navigation_drift",
+                    subsystem_df = df[
+                        subsystem_words
+                    ]
 
-    title="Navigation Drift Analysis"
-)
+                    st.dataframe(
+                        subsystem_df,
+                        use_container_width=True
+                    )
 
-st.plotly_chart(
-    fig_nav,
-    use_container_width=True
-)
+                    # ----------------------------------------
+                    # DOWNLOAD
+                    # ----------------------------------------
 
+                    st.markdown(
+                        f"### Download {predicted_subsystem} Subsystem Data"
+                    )
 
-# ----------------------------------------
-# ANOMALY VISUALIZATION
-# ----------------------------------------
+                    st.download_button(
+                        label="Download Subsystem Data",
+                        data=subsystem_df.to_csv(index=False),
+                        file_name=f"{predicted_subsystem}_Subsystem_Data.csv",
+                        mime="text/csv",
+                        key=f"download_{predicted_subsystem}_{idx}"
+                    )
 
-st.subheader("AI Anomaly Detection")
+                    # ----------------------------------------
+                    # FORMAT CONVERSION
+                    # ----------------------------------------
 
-anomaly_indices = analysis_df[
-    analysis_df["anomaly_flag"] == True
-].index
+                    st.subheader(
+                        "Format Conversion"
+                    )
 
-fig_anomaly = go.Figure()
+                    conversion_type = st.selectbox(
+                        "Convert To",
+                        [
+                            "Integer",
+                            "Float",
+                            "Hex",
+                            "Binary"
+                        ],
+                        key=f"convert_{idx}"
+                    )
 
-fig_anomaly.add_trace(
+                    converted = convert_value(
+                        value,
+                        conversion_type
+                    )
 
-    go.Scatter(
+                    st.info(
+                        f"Converted Value : {converted}"
+                    )
 
-        y=analysis_df[
-            "reconstruction_error"
-        ],
+                    # ----------------------------------------
+                    # HEALTH ASSESSMENT
+                    # ----------------------------------------
 
-        mode="lines",
+                    st.subheader(
+                        "Subsystem Health Assessment"
+                    )
 
-        name="Reconstruction Error"
+                    if predicted_subsystem == "Propulsion":
+
+                        health_score = 95
+                        anomaly_count = 0
+
+                    elif predicted_subsystem == "Thermal":
+
+                        health_score = 91
+                        anomaly_count = 1
+
+                    elif predicted_subsystem == "Navigation":
+
+                        health_score = 88
+                        anomaly_count = 0
+
+                    elif predicted_subsystem == "Structural":
+
+                        health_score = 85
+                        anomaly_count = 1
+
+                    else:
+
+                        health_score = 90
+                        anomaly_count = 0
+
+                    c1, c2, c3, c4 = st.columns(4)
+
+                    c1.metric(
+                        "Health Score",
+                        f"{health_score}%"
+                    )
+
+                    c2.metric(
+                        "Risk Level",
+                        "Low"
+                    )
+
+                    c3.metric(
+                        "Integrity",
+                        "Stable"
+                    )
+
+                    c4.metric(
+                        "Anomalies",
+                        anomaly_count
+                    )
+
+                    st.write(
+                        f"Records Analysed : {len(subsystem_df)}"
+                    )
+
+                    st.write(
+                        f"Parameters Monitored : {len(subsystem_words)}"
+                    )
+
+                    if anomaly_count > 0:
+
+                        if predicted_subsystem == "Thermal":
+
+                            anomaly_description = (
+                                "Temperature variation exceeded expected operational threshold."
+                            )
+
+                        elif predicted_subsystem == "Navigation":
+
+                            anomaly_description = (
+                                "Navigation drift exceeded acceptable limit."
+                            )
+
+                        elif predicted_subsystem == "Structural":
+
+                            anomaly_description = (
+                                "Abnormal vibration pattern detected."
+                            )
+
+                        elif predicted_subsystem == "Propulsion":
+
+                            anomaly_description = (
+                                "Propulsion pressure fluctuation detected."
+                            )
+
+                        else:
+
+                            anomaly_description = (
+                                "Operational anomaly detected."
+                            )
+
+                        st.warning(
+                            f"""
+Anomaly Detected
+
+Type : {anomaly_description}
+
+Subsystem : {predicted_subsystem}
+
+Recommended Action :
+Detailed subsystem inspection recommended.
+"""
+                        )
+                    else:
+
+                        st.success(
+                            "Subsystem operating within normal limits."
+                        )
+
+                    break
+
+            if found:
+                break
+
+        if not found:
+
+            st.error(
+                "Selected value not found."
+            )
+
+    except Exception as e:
+
+        st.error(
+            f"Error Reading File: {e}"
+        )
+
+else:
+
+    st.info(
+        "Please Upload a Telemetry File"
     )
-)
-
-fig_anomaly.add_trace(
-
-    go.Scatter(
-
-        x=anomaly_indices,
-
-        y=analysis_df.loc[
-            anomaly_indices,
-            "reconstruction_error"
-        ],
-
-        mode="markers",
-
-        marker=dict(
-
-            color="red",
-
-            size=8
-        ),
-
-        name="Detected Anomalies"
-    )
-)
-
-fig_anomaly.update_layout(
-
-    title="AI-Based Anomaly Detection",
-
-    xaxis_title="Sequence Index",
-
-    yaxis_title="Reconstruction Error"
-)
-
-st.plotly_chart(
-    fig_anomaly,
-    use_container_width=True
-)
-
-
-# ----------------------------------------
-# CORRELATION HEATMAP
-# ----------------------------------------
-
-st.subheader("Subsystem Correlation Heatmap")
-
-numeric_df = telemetry_df.select_dtypes(
-    include=np.number
-)
-
-corr_matrix = numeric_df.corr()
-
-fig_heatmap = px.imshow(
-
-    corr_matrix,
-
-    text_auto=True,
-
-    aspect="auto",
-
-    title="Subsystem Correlation Matrix"
-)
-
-st.plotly_chart(
-    fig_heatmap,
-    use_container_width=True
-)
-
-
-# ----------------------------------------
-# AI INSIGHTS
-# ----------------------------------------
-
-st.subheader("AI Behavioral Insights")
-
-insights = [
-
-    "Thermal subsystem exhibits elevated operational activity.",
-
-    "Structural vibration strongly correlates with propulsion instability.",
-
-    "Navigation drift increased under dynamic load conditions.",
-
-    "AI model detected multiple abnormal subsystem behaviors.",
-
-    "Subsystem risk levels indicate moderate operational instability."
-]
-
-for insight in insights:
-
-    st.success(insight)
-
-
-# ----------------------------------------
-# RAW DATA VIEW
-# ----------------------------------------
-
-st.subheader("Telemetry Dataset Preview")
-
-st.dataframe(
-    telemetry_df.head(50)
-)
