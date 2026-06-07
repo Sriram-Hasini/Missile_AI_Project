@@ -1,32 +1,73 @@
 import pandas as pd
 import random
 
+subsystems = {
+    "CMD_A": "Propulsion",
+    "CMD_B": "Thermal",
+    "CMD_C": "Navigation",
+    "CMD_D": "Structural",
+    "CMD_E": "Power"
+}
+
 rows = []
 
-for _ in range(50):
+for i in range(200):
 
-    row = []
+    command_prefix = random.choice(
+        list(subsystems.keys())
+    )
 
-    for col in range(32):
+    row = {
+        "Command": f"{command_prefix}_{i+1:03d}"
+    }
 
-        if col % 4 == 0:
-            row.append(random.randint(20, 100))
+    for j in range(32):
 
-        elif col % 4 == 1:
-            row.append(round(random.uniform(10.0, 60.0), 2))
+        if j % 4 == 0:
 
-        elif col % 4 == 2:
-            row.append(hex(random.randint(100, 255)))
+            row[f"W{j}"] = random.randint(
+                20,
+                100
+            )
+
+        elif j % 4 == 1:
+
+            row[f"W{j}"] = round(
+                random.uniform(
+                    10,
+                    60
+                ),
+                2
+            )
+
+        elif j % 4 == 2:
+
+            row[f"W{j}"] = hex(
+                random.randint(
+                    100,
+                    255
+                )
+            )
 
         else:
-            row.append(format(random.randint(0, 255), '08b'))
+
+            row[f"W{j}"] = format(
+                random.randint(
+                    0,
+                    255
+                ),
+                "08b"
+            )
 
     rows.append(row)
 
-columns = [f"W{i}" for i in range(32)]
+df = pd.DataFrame(rows)
 
-df = pd.DataFrame(rows, columns=columns)
+df.to_csv(
+    "sample_telemetry.csv",
+    index=False
+)
 
-df.to_csv("sample_telemetry.csv", index=False)
-
-print("50-row telemetry file generated successfully.")
+print(
+    "sample_telemetry.csv generated successfully"
+)

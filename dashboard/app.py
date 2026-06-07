@@ -16,33 +16,6 @@ import pandas as pd
 from utils.type_detector import detect_type
 from utils.converter import convert_value
 
-# ----------------------------------------
-# SUBSYSTEM GROUPS
-# ----------------------------------------
-
-SUBSYSTEM_GROUPS = {
-
-    "Propulsion": [
-        "W0", "W1", "W2", "W3", "W4", "W5"
-    ],
-
-    "Thermal": [
-        "W6", "W7", "W8", "W9", "W10", "W11"
-    ],
-
-    "Navigation": [
-        "W12", "W13", "W14", "W15", "W16", "W17"
-    ],
-
-    "Structural": [
-        "W18", "W19", "W20", "W21", "W22", "W23"
-    ],
-
-    "Power": [
-        "W24", "W25", "W26", "W27",
-        "W28", "W29", "W30", "W31"
-    ]
-}
 
 # ----------------------------------------
 # PAGE CONFIG
@@ -139,7 +112,7 @@ if uploaded_file is not None:
         )
 
         st.subheader(
-            "Select Telemetry Value"
+                "Telemetry Data Analysis"
         )
 
         search_value = st.selectbox(
@@ -165,53 +138,53 @@ if uploaded_file is not None:
                         value
                     )
 
+                    selected_row = df.iloc[idx]
+                    command_name = selected_row.get("Command", "")
+
                     predicted_subsystem = "Unknown"
+                    COMMAND_MAP = {
+    "CMD_A": "Propulsion",
+    "CMD_B": "Thermal",
+    "CMD_C": "Navigation",
+    "CMD_D": "Structural",
+    "CMD_E": "Power"
+}
 
-                    for subsystem, words in SUBSYSTEM_GROUPS.items():
+                    for cmd, subsystem in COMMAND_MAP.items():
 
-                        if col in words:
+                        if cmd in command_name:
 
                             predicted_subsystem = subsystem
-                            break
 
+                            break
                     # ----------------------------------------
-                    # PARAMETER INTERPRETATION
+                    # PACKET INFORMATION
                     # ----------------------------------------
+
+                    
 
                     st.markdown(
                         f"""
-### Parameter Interpretation
+### Subsystem Identification Report
 
 | Attribute | Value |
 |-----------|--------|
-| Selected Value | {value} |
-| Word Location | {col} |
-| Row Number | {idx} |
-| Data Type | {detected_type} |
-| Subsystem | {predicted_subsystem} |
+| Command Code | {command_name} |
+| Detected Subsystem | {predicted_subsystem} |
+| Selected Telemetry Value | {value} |
+| Parameter Location | {col} |
+| Data Format | {detected_type} |
+| Record Index | {idx} |
 """
                     )
+                    selected_row_df = df.iloc[[idx]]
 
-                    # ----------------------------------------
-                    # SUBSYSTEM DATA
-                    # ----------------------------------------
-
-                    st.markdown(
-                        f"""
-## {predicted_subsystem} Subsystem Data
-"""
+                    st.subheader(
+                        "Telemetry Data Analysis"
                     )
-
-                    subsystem_words = SUBSYSTEM_GROUPS[
-                        predicted_subsystem
-                    ]
-
-                    subsystem_df = df[
-                        subsystem_words
-                    ]
 
                     st.dataframe(
-                        subsystem_df,
+                        selected_row_df,
                         use_container_width=True
                     )
 
@@ -220,15 +193,15 @@ if uploaded_file is not None:
                     # ----------------------------------------
 
                     st.markdown(
-                        f"### Download {predicted_subsystem} Subsystem Data"
+                    "### Export Analysis Report"
                     )
 
                     st.download_button(
-                        label="Download Subsystem Data",
-                        data=subsystem_df.to_csv(index=False),
-                        file_name=f"{predicted_subsystem}_Subsystem_Data.csv",
+                        label="Download Telemetry Record",
+                        data=selected_row_df.to_csv(index=False),
+                      file_name=f"{command_name}_Telemetry_Record.csv",
                         mime="text/csv",
-                        key=f"download_{predicted_subsystem}_{idx}"
+                       key=f"download_{command_name}_{idx}"
                     )
 
                     # ----------------------------------------
@@ -236,7 +209,7 @@ if uploaded_file is not None:
                     # ----------------------------------------
 
                     st.subheader(
-                        "Format Conversion"
+                        " Telemetry Format Conversion"
                     )
 
                     conversion_type = st.selectbox(
@@ -315,13 +288,12 @@ if uploaded_file is not None:
                     )
 
                     st.write(
-                        f"Records Analysed : {len(subsystem_df)}"
-                    )
+    "Records Analysed : 1"
+)
 
                     st.write(
-                        f"Parameters Monitored : {len(subsystem_words)}"
-                    )
-
+    f"Parameters Monitored : {len(selected_row_df.columns)}"
+)
                     if anomaly_count > 0:
 
                         if predicted_subsystem == "Thermal":

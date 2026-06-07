@@ -1,153 +1,98 @@
-# 🚀 Missile AI Intelligence Dashboard
+# AI-Based Telemetry Monitoring and Anomaly Detection System
 
 ## Overview
 
-Missile AI Intelligence Dashboard is an AI-powered telemetry analysis framework designed to monitor missile subsystems, detect anomalies, assess subsystem health, and generate behavioral insights through an interactive dashboard.
+This project is an AI-powered Telemetry Monitoring and Anomaly Detection System developed for educational and research purposes. The system analyzes synthetically generated telemetry data and identifies abnormal operational patterns using machine learning techniques.
 
-The project utilizes a Hybrid LSTM-Transformer architecture to analyze telemetry data from multiple subsystems and identify abnormal operational patterns.
+> **Note:** All telemetry data used in this project is synthetic and generated for demonstration purposes only.
 
 ---
 
 ## Features
 
-* Telemetry Data Simulation
-* Data Preprocessing Pipeline
-* Hybrid LSTM + Transformer Deep Learning Model
-* AI-Based Anomaly Detection
-* Behavioral Analysis Engine
-* Subsystem Risk Assessment
-* Interactive Streamlit Dashboard
-* Real-Time Telemetry Visualization
-* Operational Phase Monitoring
-
----
-
-## Project Architecture
-
-Telemetry Data Generation
-
-↓
-
-Data Preprocessing
-
-↓
-
-Hybrid LSTM-Transformer Model
-
-↓
-
-Behavioral Analysis
-
-↓
-
-Anomaly Detection
-
-↓
-
-Risk Assessment
-
-↓
-
-Interactive Dashboard
-
----
-
-## Subsystems Monitored
-
-### Propulsion System
-
-* Pressure Monitoring
-* Thrust Analysis
-
-### Thermal System
-
-* Temperature Monitoring
-* Thermal Escalation Detection
-
-### Structural System
-
-* Vibration Analysis
-* Structural Health Monitoring
-
-### Navigation System
-
-* Navigation Drift Analysis
-* Guidance Monitoring
-
-### Power System
-
-* Voltage Monitoring
-* Current Consumption Analysis
-
----
-
-## Technologies Used
-
-* Python
-* TensorFlow
-* NumPy
-* Pandas
-* Scikit-Learn
-* Plotly
-* Streamlit
+- Synthetic telemetry data generation
+- Data preprocessing and cleaning
+- Machine learning-based anomaly detection
+- Telemetry behavior analysis
+- Interactive Streamlit dashboard
+- Data visualization and monitoring
 
 ---
 
 ## Project Structure
 
-Missile_AI_Project/
-
+```text
+MISSILE_AI_PROJECT/
+│
 ├── analysis/
-
+│   └── behavior_analysis.py
+│
 ├── dashboard/
-
+│   └── app.py
+│
 ├── data/
-
+│   ├── generator.py
+│   └── generate_sample_telemetry.py
+│
 ├── models/
-
+│   └── hybrid_model.py
+│
 ├── preprocessing/
-
+│   └── preprocessing.py
+│
 ├── training/
-
+│   └── train.py
+│
 ├── utils/
-
-├── visualization/
-
-├── main.py
-
+│   ├── anomaly.py
+│   ├── converter.py
+│   ├── helpers.py
+│   └── type_detector.py
+│
+├── sample_telemetry.csv
+├── telemetry_metadata.json
 ├── requirements.txt
-
 └── README.md
+```
+
+---
+
+## Technologies Used
+
+- Python
+- Pandas
+- NumPy
+- Scikit-Learn
+- TensorFlow / Keras
+- Streamlit
+- Plotly
 
 ---
 
 ## Installation
 
-Clone the repository:
+### Clone Repository
 
 ```bash
-git clone https://github.com/Sriram-Hasini/Missile_AI_Project.git
+git clone <repository-url>
+cd MISSILE_AI_PROJECT
 ```
 
-Navigate to project directory:
-
-```bash
-cd Missile_AI_Project
-```
-
-Create virtual environment:
+### Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-Activate virtual environment:
+### Activate Environment
+
+Windows:
 
 ```bash
 venv\Scripts\activate
 ```
 
-Install dependencies:
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -155,27 +100,7 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Project
-
-Generate telemetry data:
-
-```bash
-python data/generator.py
-```
-
-Train the AI model:
-
-```bash
-python training/train.py
-```
-
-Run behavioral analysis:
-
-```bash
-python analysis/behavior_analysis.py
-```
-
-Launch dashboard:
+## Run Dashboard
 
 ```bash
 streamlit run dashboard/app.py
@@ -183,39 +108,34 @@ streamlit run dashboard/app.py
 
 ---
 
-## Dashboard Capabilities
+## Workflow
 
-* System Health Monitoring
-* Operational Phase Visualization
-* Thermal Analysis
-* Propulsion Monitoring
-* Structural Vibration Analysis
-* Navigation Drift Monitoring
-* AI-Based Anomaly Detection
-* Correlation Heatmaps
-* Behavioral Insights
+1. Generate synthetic telemetry data
+2. Preprocess and clean data
+3. Train machine learning model
+4. Detect anomalies
+5. Visualize results using Streamlit dashboard
 
 ---
 
-## Future Enhancements
+## Applications
 
-* Real-Time Telemetry Streaming
-* Predictive Maintenance
-* Failure Forecasting
-* Advanced Risk Prediction
-* Automated Report Generation
-* Cloud Deployment
+- Telemetry Monitoring
+- AI-Based Analytics
+- Anomaly Detection
+- Research Simulations
+- Educational Machine Learning Projects
 
 ---
 
 ## Disclaimer
 
-This project uses synthetic telemetry data generated for educational and research purposes. No confidential or real-world defense data is included.
+This project is intended solely for academic and educational purposes. No real-world defense, aerospace, or classified data is used.
 
 ---
 
 ## Author
 
-Sriram Hasini
+**Hasini Sriram**
 
-AI-Powered Missile Telemetry Intelligence System
+AI-Based Telemetry Monitoring and Anomaly Detection System
