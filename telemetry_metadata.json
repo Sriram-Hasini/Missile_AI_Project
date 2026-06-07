@@ -1,0 +1,34 @@
+{
+    "anomalies": [
+        {
+            "type": "Propulsion Oscillation",
+            "start": 486,
+            "end": 620
+        },
+        {
+            "type": "Thermal Escalation",
+            "start": 740,
+            "end": 1064
+        }
+    ],
+    "ai_insights": [
+        "Thermal escalation detected during propulsion stabilization.",
+        "Structural vibration strongly correlates with propulsion pressure oscillation."
+    ],
+    "config": {
+        "seed": 42,
+        "steps": 2000,
+        "dt": 0.1,
+        "phases": 5,
+        "base_noise_std": 0.02,
+        "corr_prop_to_therm": 0.85,
+        "corr_prop_to_struct": 0.75,
+        "corr_struct_to_nav": 0.65,
+        "corr_therm_to_control": 0.55,
+        "corr_sensors_to_nav": 0.45,
+        "anomaly_probability": 0.4,
+        "anomaly_min_frac": 0.05,
+        "anomaly_max_frac": 0.18,
+        "clip": true
+    }
+}
